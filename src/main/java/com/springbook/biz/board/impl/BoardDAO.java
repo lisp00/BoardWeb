@@ -24,6 +24,9 @@ public class BoardDAO {
 	private final String BOARD_DELETE = "delete board where seq=?";
 	private final String BOARD_GET = "select * from board where seq=?";
 	private final String BOARD_LIST = "select * from board order by seq desc";
+	private final String BOARD_LIST_T = "select * from board where title like '%'||?||'%' order by seq desc";
+	private final String BOARD_LIST_C = "select * from board where content like '%'||?||'%' order by seq desc";
+	private final String BOARD_LIST_W = "select * from board where writer like '%'||?||'%' order by seq desc";
 
 	//CRUD 메소드 기능 구현
 	public void insertBoard(BoardVO vo) {
@@ -102,7 +105,16 @@ public class BoardDAO {
 		List<BoardVO> boardList = new ArrayList<BoardVO>();
 		try {
 			conn = JDBCUtil.getConnection();
-			stmt = conn.prepareStatement(BOARD_LIST);
+			System.out.println(vo.getSearchCondition());
+			if(vo.getSearchCondition().equals("TITLE")) {
+				stmt = conn.prepareStatement(BOARD_LIST_T);
+			} else if(vo.getSearchCondition().equals("CONTENT")) {
+				stmt = conn.prepareStatement(BOARD_LIST_C);
+			} else if(vo.getSearchCondition().equals("WRITER")) {
+				stmt = conn.prepareStatement(BOARD_LIST_W);
+			}
+			stmt.setString(1, vo.getSearchKeyword());
+			System.out.println(stmt);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				BoardVO board = new BoardVO();
